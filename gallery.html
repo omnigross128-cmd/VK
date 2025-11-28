@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background-color: #f4f4f4;
+    }
+
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive 4 columns */
+        gap: 20px;
+        max-width: 1200px;
+        margin: 20px auto;
+    }
+
+    .gallery-item {
+        background: #fff;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        overflow: hidden; /* Important for containing the scaled image */
+        cursor: pointer; /* Indicate it's clickable */
+        position: relative;
+    }
+
+    .gallery-item img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px; /* Slightly smaller border-radius for image within item */
+        transition: transform 0.3s ease-in-out; /* Smooth scale transition */
+        display: block; /* Remove extra space below image */
+    }
+
+    .gallery-item:hover img {
+        transform: scale(1.05); /* Enlarge image slightly on hover */
+    }
+
+    .gallery-item p {
+        margin-top: 15px;
+        font-weight: 600;
+        color: #333;
+        font-size: 1.1em;
+    }
+
+    /* --- Lightbox/Modal Styles --- */
+    .lightbox {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1000; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(5px); /* Optional: blur background */
+    }
+
+    .lightbox-content {
+        position: relative;
+        max-width: 90%;
+        max-height: 90%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .lightbox-content img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain; /* Ensure entire image is visible */
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    /* Close button */
+    .close-btn {
+        position: absolute;
+        top: 20px;
+        right: 35px;
+        color: #fff;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .close-btn:hover,
+    .close-btn:focus {
+        color: #bbb;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    /* Navigation buttons */
+    .prev-btn, .next-btn {
+        cursor: pointer;
+        position: absolute;
+        top: 50%;
+        width: auto;
+        padding: 16px;
+        margin-top: -50px;
+        color: white;
+        font-weight: bold;
+        font-size: 20px;
+        transition: 0.6s ease;
+        border-radius: 0 3px 3px 0;
+        user-select: none;
+        background-color: rgba(0,0,0,0.5);
+    }
+
+    .next-btn {
+        right: 0;
+        border-radius: 3px 0 0 3px;
+    }
+
+    .prev-btn {
+        left: 0;
+        border-radius: 0 3px 3px 0;
+    }
+
+    /* On hover, add a black background with a little more opacity */
+    .prev-btn:hover, .next-btn:hover {
+        background-color: rgba(0,0,0,0.8);
+    }
+
+    /* Caption text */
+    .lightbox-caption {
+        color: #f2f2f2;
+        font-size: 1.2em;
+        padding: 10px 0;
+        text-align: center;
+        position: absolute;
+        bottom: -50px; /* Adjust if needed */
+        width: 100%;
+    }
+</style>
+    <!--<< Header Area >>-->
+    
+<!-- Mirrored from ex-coders.com/html/pixvent/about.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 19 Aug 2025 15:48:58 GMT -->
+<head>
+       <!-- ========== Meta Tags ========== -->
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="author" content="Gramentheme">
+        <meta name="description" content="Pixvent - Conference and Event HTML Template">
+        <!-- ======== Page title ============ -->
+        <title>Pixvent - Conference and Event HTML Template</title>
+        <!--<< Favcion >>-->
+        <link rel="shortcut icon" href="assets/img/favicon.svg">
+        <!--<< Bootstrap min.css >>-->
+        <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+        <!--<< All Min Css >>-->
+        <link rel="stylesheet" href="assets/css/all.min.css">
+        <!--<< Animate.css >>-->
+        <link rel="stylesheet" href="assets/css/animate.css">
+        <!--<< Magnific Popup.css >>-->
+        <link rel="stylesheet" href="assets/css/magnific-popup.css">
+        <!--<< MeanMenu.css >>-->
+        <link rel="stylesheet" href="assets/css/meanmenu.css">
+        <!--<< Swiper Bundle.css >>-->
+        <link rel="stylesheet" href="assets/css/swiper-bundle.min.css">
+        <!--<< Nice Select.css >>-->
+        <link rel="stylesheet" href="assets/css/nice-select.css">
+        <!--<< Main.css >>-->
+        <link rel="stylesheet" href="assets/css/main.css">
+                            
+    </head>
+    <body>
+
+         
+        <!-- GT Back To Top Start -->
+        <button id="gt-back-top" class="gt-back-to-top show">
+            <i class="fa-regular fa-arrow-up"></i>
+        </button>
+
+        <!-- GT MouseCursor Start -->
+        <div class="mouseCursor cursor-outer"></div>
+        <div class="mouseCursor cursor-inner"></div>
+  
+        <!-- Offcanvas Area Start -->
+        <div class="fix-area">
+            <div class="offcanvas__info">
+                <div class="offcanvas__wrapper">
+                    <div class="offcanvas__content">
+                        <div class="offcanvas__top mb-5 d-flex justify-content-between align-items-center">
+                            <div class="offcanvas__logo">
+                                <a href="index.html">
+                                    <img src="assets/img/logo/black-logo.svg" alt="logo-img">
+                                </a>
+                            </div>
+                            <div class="offcanvas__close">
+                                <button>
+                                <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text d-none d-xl-block">
+                            Nullam dignissim, ante scelerisque the  is euismod fermentum odio sem semper the is erat, a feugiat leo urna eget eros. Duis Aenean a imperdiet risus.
+                        </p>
+                        <div class="mobile-menu fix mb-3"></div>
+                        <div class="sideber-image d-block d-xl-none">
+                            <img src="assets/img/header/sideber.jpg" alt="img">
+                        </div>
+                        <div class="offcanvas__contact d-none d-xl-block">
+                            <h4 class="d-none d-xl-block">Contact Info</h4>
+                            <ul class="d-none d-xl-block">
+                                <li class="d-flex align-items-center">
+                                    <div class="offcanvas__contact-icon">
+                                        <i class="fal fa-map-marker-alt"></i>
+                                    </div>
+                                    <div class="offcanvas__contact-text">
+                                        <a target="_blank" href="#">Main Street, Melbourne, Australia</a>
+                                    </div>
+                                </li>
+                                <li class="d-flex align-items-center">
+                                    <div class="offcanvas__contact-icon mr-15">
+                                        <i class="fal fa-envelope"></i>
+                                    </div>
+                                    <div class="offcanvas__contact-text">
+                                        <a href="mailto:info@example.com"><span class="mailto:info@example.com">info@example.com</span></a>
+                                    </div>
+                                </li>
+                                <li class="d-flex align-items-center">
+                                    <div class="offcanvas__contact-icon mr-15">
+                                        <i class="fal fa-clock"></i>
+                                    </div>
+                                    <div class="offcanvas__contact-text">
+                                        <a target="_blank" href="#">Mod-friday, 09am -05pm</a>
+                                    </div>
+                                </li>
+                                <li class="d-flex align-items-center">
+                                    <div class="offcanvas__contact-icon mr-15">
+                                        <i class="far fa-phone"></i>
+                                    </div>
+                                    <div class="offcanvas__contact-text">
+                                        <a href="tel:+11002345909">+11002345909</a>
+                                    </div>
+                                </li>
+                            </ul>
+                            <div class="social-icon d-flex align-items-center">
+                                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#"><i class="fab fa-twitter"></i></a>
+                                <a href="#"><i class="fab fa-youtube"></i></a>
+                                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="offcanvas__overlay"></div>
+
+        <!-- Header Section Start -->
+        <header id="header-sticky" class="header-1">
+            <div class="container-fluid">
+                <div class="mega-menu-wrapper">
+                    <div class="header-main">
+                        <div class="logo">
+                            <a href="index.html" class="header-logo">
+                                <img src="assets/img/logo/black-logo.svg" alt="logo-img">
+                            </a>
+                        </div>
+                        <div class="header-right d-flex justify-content-end align-items-center mt-0">
+                            <div class="mean__menu-wrapper">
+                                <div class="main-menu">
+                                    <nav id="mobile-menu">
+                                        <ul>
+                                            <li class="has-dropdown active menu-thumb">
+                                                <a href="index.html">
+                                                    Home 
+                                                </a>
+                                                
+                                            </li>
+                                           
+                                            <li class="has-dropdown">
+                                                <a href="event-details.html">
+                                                    Program
+                                                </a>
+                                               </a>
+                                                <ul class="submenu">
+                                                    <li>
+                                                        <a href="Business-Growth-Program.html">Business Growth Program</a>
+                                                    </li>
+                                                    <li class="has-dropdown">
+                                                        <a href="10X-Sales-Growth-Program.html">10X Sales Growth Program</a></li>
+                                                        <li><a href="Vision-Buliding-Program.html">Vision Buliding Program</a></li>
+                                                    <li><a href="Leadership Development Program.html">Leadership Development Program</a></li>
+                                                            
+                                                    </a>
+                                                    
+                                                </ul>
+                                            </li>
+                                             <li>
+                                                <a href="speaker-details.html">
+                                                    About VK
+                                                </a>
+                                                
+                                            </li>
+                                            <li>
+                                                <a href="gallery.html">
+                                                    Gallery
+                                                    
+                                                </a>
+                                                
+                                            </li>
+                                           <li>
+                                                <a href="event.html">
+                                                    Events
+                                                </a>
+                                                <ul class="submenu">
+                                                     <li><a href="event-details.html">Webinars</a></li>
+                                                    <li><a href="event.html">Upcoming Events</a></li>
+                                                </ul>
+                                            </li>
+                                            <li>
+                                                <a href="contact.html">Contact Us</a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>        
+                                  
+                            <div class="header-button">
+                                <a href="contact.html" class="gt-theme-btn">
+                                   <i class="fa-solid fa-ticket-simple"></i> get ticket
+                                </a>
+                            </div>
+                            <div class="header__hamburger d-xl-block my-auto">
+                                <div class="sidebar__toggle">
+                                    <i class="fas fa-bars"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- GT Search Start -->
+        <div class="search-popup">
+            <div class="search-popup__overlay search-toggler"></div>
+            <div class="search-popup__content">
+                <form role="search" method="get" class="search-popup__form" action="#">
+                    <input type="text" id="search" name="search" placeholder="Search Here...">
+                    <button type="submit" aria-label="search submit" class="search-btn">
+                        <span><i class="fa-regular fa-magnifying-glass"></i></span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Gt-Breadcrumb-Wrapper Start -->
+        <div class="gt-breadcrumb-wrapper fix">
+            <div class="gt-top-shape">
+                <img src="assets/img/inner-page/breadcrumb/bg-shape.png" alt="img">
+            </div>
+            <div class="gt-line-shape">
+                <img src="assets/img/inner-page/breadcrumb/line-shape.png" alt="img">
+            </div>
+            <div class="gt-arrow-shape float-bob-y">
+                <img src="assets/img/inner-page/breadcrumb/arrow.png" alt="img">
+            </div>
+            <div class="container-fluid">
+                <div class="gt-page-heading bg-cover" style="background-image: url(assets/img/inner-page/breadcrumb/bg.png);">
+                    <div class="gt-breadcrumb-sub-title">
+                        <h1 class="wow fadeInUp" data-wow-delay=".3s">ABOUT US</h1>
+                    </div>
+                    <ul class="gt-breadcrumb-items wow fadeInUp" data-wow-delay=".5s">
+                    <li>
+                        <a href="index.html">
+                            Home
+                        </a>
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </li>
+                    <li>
+                        <span>Gallery</span>
+                    </li>
+                  </ul>
+                </div>
+            </div>
+        </div>
+
+      <section class="gallery-section" style="padding: 40px 20px; background: #f5f5f5;">
+    <div class="gallery-grid">
+
+        <div class="gallery-item">
+            <img src="assets/img/home-1/news/news-1.jpg" alt="Event 1">
+            <p></p>
+        </div>
+
+        <div class="gallery-item">
+            <img src="assets/img/home-1/news/news-3.jpg" alt="Event 2">
+            <p></p>
+        </div>
+
+        <div class="gallery-item">
+            <img src="assets/img/home-1/news/news-6.jpg" alt="Event 3">
+            <p></p>
+        </div>
+
+        <div class="gallery-item">
+            <img src="assets/img/home-1/news/news-11.jpg" alt="Event 4">
+            <p></p>
+        </div>
+
+        <div class="gallery-item">
+            <img src="assets/img/home-1/news/news-5.jpg" alt="Event 5">
+            <p></p>
+        </div>
+        <div class="gallery-item">
+            <img src="assets/img/home-1/news/news-16.jpg" alt="Event 5">
+            <p></p>
+        </div>
+        <div class="gallery-item">
+            <img src="assets/img/home-1/news/news-14.jpg" alt="Event 5">
+            <p></p>
+        </div>
+        <div class="gallery-item">
+            <img src="assets/img/home-1/news/news-12.jpg" alt="Event 5">
+            <p></p>
+        </div>
+
+        <!-- Add more images here -->
+    </div>
+    
+</section>
+
+        
+
+        <!-- GT Footer Section Start -->
+        <footer class="gt-footer-section fix bg-cover" style="background-image: url(assets/img/home-1/footer/footer-bg-2.png);">
+            <div class="container">
+                <div class="gt-footer-widget-wrapper">
+                    <div class="gt-footer-bg-item">
+                        <a href="index.html" class="footer-logo wow fadeInUp" data-wow-delay=".3s">
+                            <img src="assets/img/logo/white-logo.svg" alt="img">
+                        </a>
+                        <ul class="gt-list wow fadeInUp" data-wow-delay=".5s">
+                            <li>
+                                <i class="fa-regular fa-location-dot"></i>
+                                 30 Bridge, Brooklyn street, United State of America
+                            </li> 
+                        </ul>
+                        <div class="gt-social-icon d-flex align-items-center wow fadeInUp" data-wow-delay=".7s">
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+                            <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+                 <div class="gt-footer-bottom">
+                    <div class="gt-footer-wrapper">
+                        <p class="wow fadeInUp" data-wow-delay=".3s">© 2025 pixvent. All Rights Reserved.</p>
+                        <ul class="gt-footer-list wow fadeInUp" data-wow-delay=".5s">
+                            <li>
+                                <a href="contact.html">Cookies</a>
+                            </li>
+                            <li>
+                                <a href="contact.html">Privacy</a>
+                            </li>
+                            <li>
+                                <a href="contact.html">Terms</a>
+                            </li>
+                            <a href="career.html">Careers</a>
+                        </ul>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </footer>
+         
+        <!--<< All JS Plugins >>-->
+        <script src="assets/js/jquery-3.7.1.min.js"></script>
+        <!--<< Viewport Js >>-->
+        <script src="assets/js/viewport.jquery.js"></script>
+        <!--<< Bootstrap Js >>-->
+        <script src="assets/js/bootstrap.bundle.min.js"></script>
+        <!--<< nice-selec Js >>-->
+        <script src="assets/js/jquery.nice-select.min.js"></script>
+        <!--<< Waypoints Js >>-->
+        <script src="assets/js/jquery.waypoints.js"></script>
+        <!--<< Counterup Js >>-->
+        <script src="assets/js/jquery.counterup.min.js"></script>
+        <!--<< Swiper Slider Js >>-->
+        <script src="assets/js/swiper-bundle.min.js"></script>
+        <!--<< MeanMenu Js >>-->
+        <script src="assets/js/jquery.meanmenu.min.js"></script>
+        <!--<< Magnific Popup Js >>-->
+        <script src="assets/js/jquery.magnific-popup.min.js"></script>
+        <!--<< Wow Animation Js >>-->
+        <script src="assets/js/wow.min.js"></script>
+        <!--<< Main.js >>-->
+        <script src="assets/js/main.js"></script>
+    </body>
+
+<!-- Mirrored from ex-coders.com/html/pixvent/about.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 19 Aug 2025 15:48:58 GMT -->
+</html>
